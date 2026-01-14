@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "url-monitor"
+version = "0.1.0"
+description = "URL monitor that checks endpoints and generates a Markdown report."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["requests"]
+
+[project.scripts]
+url-monitor = "url_monitor.cli:main"
+
+[dependency-groups]
+# dev: always-on developer tools (lint/test)
+dev = [
+  "ruff",
+  "pytest",
+  "responses",
+]
+
+[tool.uv]
+# Default groups installed by `uv sync` (keep small early on)
+default-groups = ["dev"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"

@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+
+# Packaging / build artifacts
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Virtual environments
+.venv/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+README_TEMPLATE.md
