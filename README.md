@@ -1,33 +1,37 @@
 # URL Monitor
 
-A small URL monitoring CLI that checks endpoints via HTTP GET and generates a Markdown report (and optional JSON output).
+A portfolio-grade Python CLI that checks a list of URLs via HTTP GET, measures latency, and generates:
 
-## Features
+- a human-readable Markdown report (`report.md`)
+- an optional machine-readable JSON artifact (`results.json`)
 
-- Validate input URLs (http/https + netloc required)
-- Perform HTTP checks with latency measurement
-- Summarize results:
-  - OK / FAIL counts and error rate
-  - Status-class breakdown (2xx/3xx/4xx/5xx/other)
-  - Latency stats for **success** and **failure** samples (avg / p95 when available)
-  - Slowest endpoints (top N)
-  - Separate reporting for:
-    - HTTP failures (non-OK HTTP status)
-    - Exceptions (request errors)
-- Generate human-readable `report.md`
-- (Optional) Save machine-readable `results.json`
+This project is designed to be reproducible (uv lockfile), CI-friendly (Ruff + pytest + GitHub Actions), and stable (tests do not rely on external network).
 
-## Why this project
+## What it does
 
-This project is built as a portfolio-quality Python CLI with:
-- reproducible environments (`uv.lock`)
-- automated checks (Ruff + pytest)
-- CI (GitHub Actions)
-- network-independent tests (HTTP is mocked)
+Given an input file (`urls.txt`) with one URL per line, URL Monitor will:
+
+1. Validate input lines (http/https + netloc required)
+2. Send HTTP GET requests with a configurable timeout
+3. Collect per-URL results (status, latency, errors)
+4. Compute summary metrics:
+   - OK / FAIL counts, error rate
+   - Status-class breakdown (2xx/3xx/4xx/5xx/other)
+   - Latency stats for **success** and **failure** samples (avg / p95 when available)
+   - Slowest endpoints (top N)
+   - Separate reporting for HTTP failures vs exceptions
+5. Write `report.md` (and optionally `results.json`)
 
 ## Quickstart
 
+### Responsible use
+
+This tool is intended for small-scale checks of endpoints you own or are authorized to test.
+Do not use it for load testing or high-frequency monitoring against third-party services.
+For performance/stress testing, use mocked or controlled endpoints (tests in this repo do not require external network).
+
 ### Requirements
+
 - Python 3.13
 - `uv` installed
 
@@ -37,9 +41,9 @@ This project is built as a portfolio-quality Python CLI with:
 uv sync --locked
 ```
 
-### Run
+### Prepare input
 
-Create `urls.txt` (one URL per line). Example:
+Create `urls.txt`:
 
 ```txt
 https://example.com
@@ -47,19 +51,50 @@ https://httpbin.org/status/200
 https://httpbin.org/status/404
 ```
 
-Generate a Markdown report:
+### Run (Markdown report)
+
+Note: Use this repo via `git clone` + `uv sync --locked`. You can run it either as a console script (`uv run url-monitor ...`) or via module execution (`uv run -- python -m url_monitor ...`).
+
+By default, the report is written to `report.md` in the current directory.
 
 ```bash
+# Console script
 uv run url-monitor --input urls.txt --out report.md
+
+# Same behavior via module execution
+uv run -- python -m url_monitor --input urls.txt --out report.md
 ```
 
-Write both `report.md` and `results.json` into a directory:
+Tip: since defaults exist, you can omit `--input` and/or `--out` if you use `urls.txt` and `report.md`.
 
 ```bash
-uv run url-monitor --input urls.txt --out-dir out/
+uv run url-monitor
 ```
 
-## CLI
+### Run (Artifacts: report.md + results.json)
+
+Use `--out-dir` to write both `report.md` and `results.json` into a directory.
+(Note: when `--out-dir` is set, `--out` is ignored.)
+
+```bash
+# Console script
+uv run url-monitor --input urls.txt --out-dir out/
+
+# Same behavior via module execution
+uv run -- python -m url_monitor --input urls.txt --out-dir out/
+```
+
+Outputs:
+
+- `out/report.md`
+- `out/results.json`
+
+### Common options
+
+- `--timeout <seconds>`: request timeout (default: 5.0)
+- `--strict`: fail fast if the input contains invalid URLs
+
+## CLI options
 
 ```bash
 uv run url-monitor --help
@@ -67,31 +102,72 @@ uv run url-monitor --help
 
 Common options:
 
-- `--input PATH` : input file path (default: `urls.txt`)
-- `--out PATH` : output Markdown path (default: `report.md`)
-- `--out-dir DIR` : output directory (writes `report.md` + `results.json`)
-- `--timeout SECONDS` : request timeout (default: `5.0`)
-- `--strict` : fail fast on invalid input lines
+- `--input PATH`: input file path (default: `urls.txt`)
+- `--out PATH`: output Markdown path (default: `report.md`)
+- `--out-dir DIR`: output directory (writes `report.md` + `results.json`)
+- `--timeout SECONDS`: request timeout (default: `5.0`)
+- `--strict`: fail fast on invalid input lines
 
-## Output
+### Notes on invalid input
 
-### `report.md`
+- With `--strict`, invalid lines fail fast with a clear error message.
+- Without `--strict`, invalid lines are collected and displayed in the report under “Invalid input lines”.
+
+## Output artifacts
+
+### `report.md` (human-readable)
+
 The report includes:
+
 - Summary (counts, error rate, sample sizes)
 - Status breakdown
 - Slowest URLs
 - HTTP failures (non-OK status)
-- Exceptions
+- Exceptions (request errors)
 - Invalid input lines (when `--strict` is not used)
 
-### `results.json` (optional)
-When `--out-dir` is used, a JSON file is written:
+This is intended for quick triage and sharing.
+
+### `results.json` (machine-readable, optional)
+
+Written when `--out-dir` is used.
+
+Top-level fields:
 
 - `source`: input file name/path
 - `summary`: aggregated metrics
 - `results`: list of per-URL check results
 
-This format is intended for further analysis (e.g., time-series aggregation, dashboards).
+This is intended for downstream analysis (e.g., time-series aggregation, dashboards).
+
+## Library usage (public API)
+
+This package exposes a minimal public API:
+
+- `run_monitor(...)` runs checks and returns `(results, summary, report_md, invalids)`
+- `save_outputs(...)` writes `report.md` and `results.json` into a directory
+
+Example:
+
+```python
+from pathlib import Path
+
+from url_monitor import run_monitor, save_outputs
+
+results, summary, report_md, invalids = run_monitor(
+    Path("urls.txt"),
+    timeout=5.0,
+    strict=False,
+)
+
+save_outputs(
+    results=results,
+    summary=summary,
+    report_md=report_md,
+    source="urls.txt",
+    out_dir=Path("out"),
+)
+```
 
 ## Development
 
@@ -102,7 +178,7 @@ uv run ruff check .
 uv run ruff format --check .
 ```
 
-(Format locally if needed)
+Format locally:
 
 ```bash
 uv run ruff format .
@@ -115,6 +191,7 @@ uv run pytest -q
 ```
 
 ### Notes on testing
+
 Tests do **not** rely on external network access.
 HTTP behavior is mocked to keep CI stable and reproducible.
 
@@ -122,8 +199,14 @@ HTTP behavior is mocked to keep CI stable and reproducible.
 
 ```text
 url-monitor/
+  README.md
+  LICENSE
+  pyproject.toml
+  uv.lock
   src/
     url_monitor/
+      __init__.py
+      __main__.py
       cli.py
       pipeline.py
       outputs.py
@@ -134,12 +217,12 @@ url-monitor/
       stats.py
       report.py
   tests/
-  pyproject.toml
-  uv.lock
-  .github/workflows/ci.yml
+  .github/
+    workflows/
+      ci.yml
 ```
 
-## Roadmap (optional)
+## Roadmap
 
 - [ ] Persist historical runs (SQLite / Parquet)
 - [ ] Add concurrency with rate limiting
@@ -148,4 +231,4 @@ url-monitor/
 
 ## License
 
-MIT License (SPDX: MIT). See `LICENSE`.
+MIT License. See `LICENSE`.
