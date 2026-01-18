@@ -1,11 +1,12 @@
 # URL Monitor
 
-A portfolio-grade Python CLI that checks a list of URLs via HTTP GET, measures latency, and generates:
+A Python CLI that checks a list of URLs via HTTP GET, measures latency, and generates:
 
 - a human-readable Markdown report (`report.md`)
 - an optional machine-readable JSON artifact (`results.json`)
 
-This project is designed to be reproducible (uv lockfile), CI-friendly (Ruff + pytest + GitHub Actions), and stable (tests do not rely on external network).
+This project is designed to be reproducible (uv lockfile) and CI-friendly (Ruff + pytest + GitHub Actions). Tests are intended to avoid external network dependency (work in progress).
+The CLI can be run against real endpoints you own or are authorized to test, but it is intended for small-scale checks rather than continuous monitoring or load testing.
 
 ## What it does
 
@@ -192,8 +193,7 @@ uv run pytest -q
 
 ### Notes on testing
 
-Tests do **not** rely on external network access.
-HTTP behavior is mocked to keep CI stable and reproducible.
+Tests are currently minimal. Network-independent tests (mocked HTTP) will be added to keep CI stable and reproducible.
 
 ## Project structure
 
@@ -224,10 +224,15 @@ url-monitor/
 
 ## Roadmap
 
+- [ ] Add network-independent tests (mocked HTTP) for CI stability
 - [ ] Persist historical runs (SQLite / Parquet)
 - [ ] Add concurrency with rate limiting
 - [ ] Add configurable retries/backoff
 - [ ] Add richer statistical reporting (distribution plots, trend analysis)
+
+## Documentation
+
+- [GitHub SSH Runbook (macOS)](docs/github-ssh-runbook.md)
 
 ## License
 

@@ -24,7 +24,11 @@ def summarize(results: Iterable[CheckResult]) -> dict[str, Any]:
     ok_count = sum(1 for r in results if r.ok)
     fail_count = total - ok_count
 
-    http_failures = [r for r in results if (not r.ok) and (r.status_code is not None) and (r.error is None)]
+    http_failures = [
+        r
+        for r in results
+        if (not r.ok) and (r.status_code is not None) and (r.error is None)
+    ]
     exceptions = [r for r in results if (not r.ok) and (r.error is not None)]
 
     # Status breakdown (by status_code class; exceptions fall into "other")
@@ -33,14 +37,18 @@ def summarize(results: Iterable[CheckResult]) -> dict[str, Any]:
         by_class[classify_status(r.status_code)] += 1
 
     # Success latency stats (only ok)
-    success_elapsed = [r.elapsed_ms for r in results if r.ok and r.elapsed_ms is not None]
+    success_elapsed = [
+        r.elapsed_ms for r in results if r.ok and r.elapsed_ms is not None
+    ]
     success_elapsed_f = [float(x) for x in success_elapsed]
     success_avg = statistics.mean(success_elapsed_f) if success_elapsed_f else None
     success_max = max(success_elapsed_f) if success_elapsed_f else None
     success_p95 = _p95_inclusive(success_elapsed_f)
 
     # Failure latency stats (non-ok; include both HTTP failures + exceptions if elapsed exists)
-    failure_elapsed = [r.elapsed_ms for r in results if (not r.ok) and r.elapsed_ms is not None]
+    failure_elapsed = [
+        r.elapsed_ms for r in results if (not r.ok) and r.elapsed_ms is not None
+    ]
     failure_elapsed_f = [float(x) for x in failure_elapsed]
     failure_avg = statistics.mean(failure_elapsed_f) if failure_elapsed_f else None
     failure_p95 = _p95_inclusive(failure_elapsed_f)
