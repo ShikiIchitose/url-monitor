@@ -8,6 +8,20 @@ A Python CLI that checks a list of URLs via HTTP GET, measures latency, and gene
 This project is designed to be reproducible (uv lockfile) and CI-friendly (Ruff + pytest + GitHub Actions). Tests are intended to avoid external network dependency (work in progress).
 The CLI can be run against real endpoints you own or are authorized to test, but it is intended for small-scale checks rather than continuous monitoring or load testing.
 
+## Architecture overview
+
+```mermaid
+flowchart LR
+  U["User"] --> CLI["CLI: url-monitor / python -m url_monitor"]
+  IN["Input: urls.txt"] --> CLI
+  CLI --> CORE["Pipeline: checks + aggregation + rendering"]
+  CORE --> OUT1["Output: report.md (Markdown)"]
+  CORE --> OUT2["Output: results.json (raw data)"]
+
+  CORE --> HTTP["HTTP client (requests)"]
+  CORE --> VALID["Validation (URL format, status classes)"]
+```
+
 ## What it does
 
 Given an input file (`urls.txt`) with one URL per line, URL Monitor will:
