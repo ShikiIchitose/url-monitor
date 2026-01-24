@@ -74,6 +74,7 @@ results.json
 # Scratch / temp
 scratch/
 tmp/
+temp/
 
 # Project policy (currently ignored; revisit for portfolio reproducibility)
 examples/
