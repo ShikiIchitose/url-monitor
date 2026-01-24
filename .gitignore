@@ -51,7 +51,17 @@ htmlcov/
 # --------------------------------------------------------------------
 .DS_Store
 .idea/
-.vscode/
+# VS Code: ignore all, but allow sharing recommended settings (optional)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+
+# Built Visual Studio Code Extensions
+*.vsix
 
 # --------------------------------------------------------------------
 # Local project-specific files (do not commit)
@@ -60,4 +70,10 @@ urls.txt
 out/
 report.md
 results.json
+
+# Scratch / temp
+scratch/
+tmp/
+
+# Project policy (currently ignored; revisit for portfolio reproducibility)
 examples/
