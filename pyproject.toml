@@ -22,6 +22,7 @@ dev = [
   "pytest",
   "responses",
   "pytest-socket>=0.7.0",
+  "requests-mock>=1.12.1",
 ]
 
 [tool.uv]
