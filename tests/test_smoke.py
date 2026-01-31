@@ -10,13 +10,14 @@ def test_public_api_importable() -> None:
     assert callable(url_monitor.save_outputs)
 
 
-def test_cli_help_exits_zero() -> None:
+def test_cli_help_exits_zero(capsys) -> None:
     from url_monitor.cli import build_parser
 
     # argparse exits with SystemExit(0) on --help
     with pytest.raises(SystemExit) as excinfo:
         build_parser().parse_args(["--help"])
     assert excinfo.value.code == 0
+    capsys.readouterr()
 
 
 def test_cli_parser_defaults() -> None:

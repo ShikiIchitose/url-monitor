@@ -21,6 +21,8 @@ dev = [
   "ruff",
   "pytest",
   "responses",
+  "pytest-socket>=0.7.0",
+  "requests-mock>=1.12.1",
 ]
 
 [tool.uv]
@@ -42,3 +44,11 @@ select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--disable-socket",
+]
