@@ -5,8 +5,18 @@ A Python CLI that checks a list of URLs via HTTP GET, measures latency, and gene
 - a human-readable Markdown report (`report.md`)
 - an optional machine-readable JSON artifact (`results.json`)
 
-This project is designed to be reproducible (uv lockfile) and CI-friendly (Ruff + pytest + GitHub Actions). Tests are intended to avoid external network dependency (work in progress).
+This project is designed to be reproducible (uv lockfile) and CI-friendly (Ruff + pytest + GitHub Actions).
+
+Tests are network-isolated by default (socket blocked via pytest-socket; HTTP mocked via requests-mock).
 The CLI can be run against real endpoints you own or are authorized to test, but it is intended for small-scale checks rather than continuous monitoring or load testing.
+
+## Project status
+
+This repository is a **portfolio demonstration** and is not under active development.
+
+- No feature development is planned (only small, non-functional maintenance such as typo fixes).
+- No support is provided (issues/PRs may be ignored).
+- The CLI interface and any imported functions are **best-effort** and may change without notice.
 
 ## Architecture overview
 
@@ -62,8 +72,8 @@ Create `urls.txt`:
 
 ```txt
 https://example.com
-https://httpbin.org/status/200
-https://httpbin.org/status/404
+https://example.org
+https://example.net
 ```
 
 ### Run (Markdown report)
@@ -89,7 +99,7 @@ uv run url-monitor
 ### Run (Artifacts: report.md + results.json)
 
 Use `--out-dir` to write both `report.md` and `results.json` into a directory.
-(Note: when `--out-dir` is set, `--out` is ignored.)
+(Note: for the authoritative semantics and defaults of these options, refer to `url-monitor --help`.)
 
 ```bash
 # Console script
@@ -155,9 +165,9 @@ Top-level fields:
 
 This is intended for downstream analysis (e.g., time-series aggregation, dashboards).
 
-## Library usage (public API)
+## Library usage (best-effort API)
 
-This package exposes a minimal public API:
+This package exposes a small **best-effort** Python API for reuse. It is provided to demonstrate code structure; it is **not supported** and comes with **no stability guarantees**:
 
 - `run_monitor(...)` runs checks and returns `(results, summary, report_md, invalids)`
 - `save_outputs(...)` writes `report.md` and `results.json` into a directory
@@ -207,7 +217,9 @@ uv run pytest -q
 
 ### Notes on testing
 
-Tests are currently minimal. Network-independent tests (mocked HTTP) will be added to keep CI stable and reproducible.
+- Unit tests are **offline by default**: the test suite runs with `--disable-socket` (via pytest-socket), so any accidental real network I/O fails fast.
+- HTTP behavior is tested with the `requests_mock` pytest fixture (requests-mock), so `requests.Session.get(...)` is exercised without talking to the internet.
+- Latency percentiles are tested deterministically by monkeypatching `time.perf_counter` (no flaky timing).
 
 ## Project structure
 
@@ -231,6 +243,14 @@ url-monitor/
       stats.py
       report.py
   tests/
+    test_http.py
+    test_pipeline_p95_demo.py
+    test_report.py
+    test_smoke.py
+    test_stats.py
+    test_validate.py
+  docs/
+    github-ssh-runbook.md
   .github/
     workflows/
       ci.yml
@@ -238,7 +258,7 @@ url-monitor/
 
 ## Roadmap
 
-- [ ] Add network-independent tests (mocked HTTP) for CI stability
+- [x] Add network-independent tests (mocked HTTP) for CI stability
 - [ ] Persist historical runs (SQLite / Parquet)
 - [ ] Add concurrency with rate limiting
 - [ ] Add configurable retries/backoff
