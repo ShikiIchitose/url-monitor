@@ -1,5 +1,7 @@
 # URL Monitor
 
+> 日本語版: [README.ja.md](README.ja.md)
+
 A Python CLI that checks a list of URLs via HTTP GET, measures latency, and generates:
 
 - a human-readable Markdown report (`report.md`)

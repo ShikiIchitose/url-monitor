@@ -293,17 +293,13 @@ chmod 644 ~/.ssh/github_ed25519.pub
 
 ## References (primary sources)
 
-GitHub Docs (SSH):
+### GitHub Docs (SSH)
 
-```text
-https://docs.github.com/en/authentication/connecting-to-github-with-ssh
-https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
-https://docs.github.com/en/get-started/git-basics/managing-remote-repositories
-https://docs.github.com/en/authentication/troubleshooting-ssh/error-ssh-add-illegal-option----apple-use-keychain
-```
+- [Connecting to GitHub with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+- [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+- [Managing remote repositories](https://docs.github.com/en/get-started/git-basics/managing-remote-repositories)
+- [Error: ssh-add: illegal option -- -apple-use-keychain](https://docs.github.com/en/authentication/troubleshooting-ssh/error-ssh-add-illegal-option----apple-use-keychain)
 
-OpenSSH documentation:
+### OpenSSH documentation
 
-```text
-https://man.openbsd.org/ssh_config
-```
+- [ssh_config(5)](https://man.openbsd.org/ssh_config)
