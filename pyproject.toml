@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "URL monitor that checks endpoints and generates a Markdown report."
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
+authors = [
+    { name = "Shiki Ichitose", email = "149179099+ShikiIchitose@users.noreply.github.com" }
+]
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = ["requests"]
@@ -15,22 +18,30 @@ dependencies = ["requests"]
 [project.scripts]
 url-monitor = "url_monitor.cli:main"
 
-[dependency-groups]
-# dev: always-on developer tools (lint/test)
+# pip users: `pip install -e ".[dev]"`
+# (Kept intentionally in addition to dependency-groups for compatibility.)
+[project.optional-dependencies]
 dev = [
   "ruff",
   "pytest",
-  "responses",
+  "pytest-socket>=0.7.0",
+  "requests-mock>=1.12.1",
+]
+
+# uv users: `uv sync --locked` (dev is included by default via tool.uv.default-groups)
+[dependency-groups]
+dev = [
+  "ruff",
+  "pytest",
   "pytest-socket>=0.7.0",
   "requests-mock>=1.12.1",
 ]
 
 [tool.uv]
-# Default groups installed by `uv sync` (keep small early on)
 default-groups = ["dev"]
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

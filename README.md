@@ -60,13 +60,27 @@ For performance/stress testing, use mocked or controlled endpoints (tests in thi
 ### Requirements
 
 - Python 3.13
-- `uv` installed
+- Recommended: `uv` (fast and reproducible via `uv.lock`)
+- Alternative: `pip` (see below)
 
-### Install / Sync dependencies
+### Install / Sync dependencies (uv, recommended)
 
 ```bash
 uv sync --locked
 ```
+
+### Alternative install (pip)
+
+If you don't use `uv`, you can install the project with `pip`.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -U pip
+pip install -e ".[dev]"
+```
+
+- To run only the CLI (no dev tools), use `pip install -e .` instead.
 
 ### Prepare input
 
@@ -80,7 +94,7 @@ https://example.net
 
 ### Run (Markdown report)
 
-Note: Use this repo via `git clone` + `uv sync --locked`. You can run it either as a console script (`uv run url-monitor ...`) or via module execution (`uv run -- python -m url_monitor ...`).
+Note: Use this repo via `git clone` + (`uv sync --locked` recommended; or the pip alternative above). You can run it either as a console script (`uv run url-monitor ...`) or via module execution (`uv run -- python -m url_monitor ...`).
 
 By default, the report is written to `report.md` in the current directory.
 
