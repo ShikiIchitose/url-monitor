@@ -11,21 +11,23 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
-      - name: Install uv
+      - name: Install uv (with cache)
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
-      - name: Install dependencies
-        run: uv sync --locked --dev
+      - name: Install dependencies (locked)
+        run: uv sync --locked
 
       - name: Lint
         run: uv run ruff check .
