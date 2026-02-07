@@ -57,16 +57,30 @@ flowchart LR
 第三者サービスに対する負荷試験（load testing）や高頻度監視（high-frequency monitoring）には使用しないでください。
 性能評価 / ストレステストには、モックまたは制御されたエンドポイントを使ってください（このリポのテストは外部ネットワークを必要としません）。
 
-### 要件（Requirements）
+### 必要要件
 
 - Python 3.13
-- `uv` がインストールされていること
+- 推奨：`uv`（高速かつ、`uv.lock` による再現性があります）
+- 代替：`pip`（下記参照）
 
-### 依存のインストール / 同期（Install / Sync dependencies）
+### 依存関係のインストール / 同期（uv、推奨）
 
 ```bash
 uv sync --locked
 ```
+
+### 代替インストール（pip）
+
+`uv` を使わない場合は、`pip` でもプロジェクトをインストールできます。
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -U pip
+pip install -e ".[dev]"
+```
+
+- CLI の実行のみ（開発ツールなし）でよい場合は、代わりに `pip install -e .` を使ってください。
 
 ### 入力の準備（Prepare input）
 
@@ -80,7 +94,7 @@ https://example.net
 
 ### 実行（Markdown report）（Run (Markdown report)）
 
-注: このリポは `git clone` + `uv sync --locked` で利用します。コンソールスクリプト（`uv run url-monitor ...`）として実行することも、モジュール実行（`uv run -- python -m url_monitor ...`）として実行することもできます。
+注：このリポジトリは `git clone` の上（`uv sync --locked` を推奨。もしくは上記の pip による代替手順）利用してください。`uv` の場合の実行方法は、コンソールスクリプトとして実行する方法（`uv run url-monitor ...`）と、モジュール実行する方法（`uv run -- python -m url_monitor ...`）のどちらでも可能です。
 
 デフォルトでは、レポートはカレントディレクトリに `report.md` として書き出されます。
 
